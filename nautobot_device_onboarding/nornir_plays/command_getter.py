@@ -18,6 +18,7 @@ from nornir_netmiko.tasks import netmiko_send_command
 from ntc_templates.parse import parse_output
 
 from nautobot_device_onboarding.constants import SUPPORTED_COMMAND_PARSERS, SUPPORTED_NETWORK_DRIVERS
+from nautobot_device_onboarding.utils.db import close_threaded_db_connections
 from nautobot_device_onboarding.nornir_plays.empty_inventory import EmptyInventory
 from nautobot_device_onboarding.nornir_plays.inventory_creator import _set_inventory
 from nautobot_device_onboarding.nornir_plays.logger import NornirLogger
@@ -87,7 +88,7 @@ def _get_commands_to_run(yaml_parsed_info, sync_vlans, sync_vrfs):
                     all_commands.append(current_root_key)
     return deduplicate_command_list(all_commands)
 
-
+@close_threaded_db_connections
 def netmiko_send_commands(task: Task, command_getter_yaml_data: Dict, command_getter_job: str, **orig_job_kwargs):
     """Run commands specified in PLATFORM_COMMAND_MAP."""
     if not task.host.platform:
